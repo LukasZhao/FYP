@@ -1,4 +1,4 @@
-User
+
 package players.reinforcement;
 
 import core.AbstractGameState;
@@ -13,7 +13,6 @@ import games.blackjack.BlackjackGameState;
 import games.blackjack.BlackjackParameters;
 import net.jpountz.util.Utils;
 import players.PlayerType;
-import players.reinforcement.WinRateCalculator;
 import players.simple.RandomPlayer;
 import utilities.ElapsedCpuTimer;
 import core.CoreConstants;
@@ -173,11 +172,10 @@ public class RL_player extends AbstractPlayer {
         double win = 0.0;
         double lose = 0.0;
         double draw = 0.0;
-        RL_player rlPlayer = new RL_player(0.4, 0.95, 1, System.currentTimeMillis());
+        RL_player rlPlayer = new RL_player(0.8, 0.95, 0.7, System.currentTimeMillis());
         // 初始化前向模型
         BlackjackForwardModel model = new BlackjackForwardModel();
         RewardChart chart = new RewardChart("RL Training Reward Progress", totalIterations);
-        QTableVisualizer visualizer = new QTableVisualizer();
 
         for (int i = 0; i < totalIterations; i++) {
             long seed = System.currentTimeMillis(); // 更新种子以保证随机性
@@ -199,15 +197,9 @@ public class RL_player extends AbstractPlayer {
                     rlPlayer.updateQTable(rlPlayer.encodeState(gameState), chosenAction, reward, nextState,
                             gameState.isGameOver());
                     chart.updateChart(i, reward);
-                    // 更新 Q-表的视图
-                    visualizer.updateQTable(rlPlayer.qTable, i + 1);
                     break;
                 }
             }
-
-            // 输出当前迭代次数以验证
-            // System.out.println("Iteration: " + i+1);
-            //visualizer.updateQTable(rlPlayer.qTable, i + 1);
         }
         System.out.println("Training completed.");
         double win_rate = (win/totalIterations)*100;
@@ -216,9 +208,6 @@ public class RL_player extends AbstractPlayer {
         System.out.println(win_rate + "%");
         System.out.println(lose_rate + "%");
         chart.displayChart();
-        //visualizer.QTableVisualizer();
-        // rlPlayer.qTable.forEach((key, value) -> System.out.println(key + ": " +
-        // value));
     }
 
 }
