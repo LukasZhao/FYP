@@ -82,7 +82,7 @@ public abstract class AbstractGameState {
     /**
      * Resets variables initialised for this game state.
      */
-    void reset() {
+    public void reset() {
         allComponents = new Area(-1, "All Components");
         gameStatus = GAME_ONGOING;
         playerResults = new CoreConstants.GameResult[getNPlayers()];
@@ -101,7 +101,7 @@ public abstract class AbstractGameState {
     /**
      * Resets variables initialised for this game state.
      */
-    void reset(long seed) {
+    public void reset(long seed) {
         gameParameters.randomSeed = seed;
         reset();
     }
@@ -252,6 +252,7 @@ public abstract class AbstractGameState {
         allComponents.clear();
         allComponents.putComponents(_getAllComponents());
     }
+    // 更多的逻辑可以添加，比如检查是否所有的牌都已经被发出
 
     /**
      * Public access copy method, which always does a full copy of the game state.

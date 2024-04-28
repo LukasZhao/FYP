@@ -194,6 +194,6 @@ public class PandemicGame extends Game {
 
         // Run
         runCompetition(config, nPlayers, playersToTest, nRepetitions);
-//        runWithStats(config, nPlayers, nRepetitions);
+        runWithStats(config, nPlayers, nRepetitions);
     }
 }

@@ -17,9 +17,9 @@ import players.human.ActionController;
 import players.human.HumanConsolePlayer;
 import players.human.HumanGUIPlayer;
 import players.mcts.MCTSPlayer;
+import players.reinforcement.RL_player;
 import players.mcts.MCTSPlayer;
-import players.rmhc.RMHCParams;
-import players.rmhc.RMHCPlayer;
+
 import players.simple.FirstActionPlayer;
 import players.simple.OSLAPlayer;
 import players.simple.RandomPlayer;
@@ -821,45 +821,34 @@ public class Game {
      * and then run this class.
      */
     public static void main(String[] args) {
-        String gameType = Utils.getArg(args, "game", "Pandemic");
-        boolean useGUI = Utils.getArg(args, "gui", true);
-        int turnPause = Utils.getArg(args, "turnPause", 0);
-        long seed = Utils.getArg(args, "seed", System.currentTimeMillis());
-        ActionController ac = new ActionController();
+        String gameType = "Blackjack"; // 选择游戏类型
+        boolean useGUI = true; // 是否使用图形界面
+        int turnPause = 1000; // 每回合的暂停时间（毫秒），可用于观察
+        long seed = System.currentTimeMillis(); // 游戏的随机种子
+        ActionController ac = new ActionController(); // GUI交互控制器
 
-        /* Set up players for the game */
+        // 设置玩家
         ArrayList<AbstractPlayer> players = new ArrayList<>();
+        RL_player trainedRLPlayer = new RL_player(0.6, 0.9, 0.8,seed); // 假设alpha=0.1, gamma=0.9, epsilon=0.1
+        
+
+        // 复制RL玩家
+        RL_player playerCopy1 = (RL_player) trainedRLPlayer.copy();
+
+
+        players.add(playerCopy1);
+        players.add(playerCopy1);
+        players.add(new HumanGUIPlayer(ac));
         players.add(new RandomPlayer());
         players.add(new RandomPlayer());
-        players.add(new BasicMCTSPlayer());
+        
+        
+        
+         // 添加另一个随机玩家进行比较
 
-//        RMHCParams params = new RMHCParams();
-//        params.horizon = 15;
-//        params.discountFactor = 0.99;
-//        params.heuristic = AbstractGameState::getHeuristicScore;
-//        AbstractPlayer rmhcPlayer = new RMHCPlayer(params);
-//        players.add(rmhcPlayer);
-
-//        MCTSParams params = new MCTSParams();
-//        players.add(new MCTSPlayer(params));
-
-//        players.add(new OSLAPlayer());
-//        players.add(new RMHCPlayer());
-//        players.add(new HumanGUIPlayer(ac));
-//        players.add(new HumanConsolePlayer());
-//        players.add(new FirstActionPlayer());
-
-        /* Game parameter configuration. Set to null to ignore and use default parameters */
-        String gameParams = null;
-
-        /* Run! */
-        runOne(GameType.valueOf(gameType), gameParams, players, seed, false, null, useGUI ? ac : null, turnPause);
-
-        /* Run multiple games */
-//        ArrayList<GameType> games = new ArrayList<>();
-//        games.add(Connect4);
-//        runMany(games, players, 100L, 5, false, false, null, turnPause);
-//        runMany(new ArrayList<GameType>() {{add(Uno);}}, players, 100L, 100, false, false, null, turnPause);
+    // 运行游戏
+    runOne(GameType.valueOf(gameType), null, players, seed, false, null, useGUI ? ac : null, turnPause);
+}
     }
 
-}
+

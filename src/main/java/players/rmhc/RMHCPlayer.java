@@ -2,9 +2,13 @@ package players.rmhc;
 
 import core.AbstractGameState;
 import core.AbstractPlayer;
+import core.Game;
 import core.actions.AbstractAction;
 import core.interfaces.IStateHeuristic;
+import net.jpountz.util.Utils;
 import players.PlayerConstants;
+import players.human.ActionController;
+import players.simple.RandomPlayer;
 import utilities.ElapsedCpuTimer;
 
 import java.util.*;
@@ -117,27 +121,27 @@ public class RMHCPlayer extends AbstractPlayer {
         avgTimeTaken = acumTimeTaken / numIters;
     }
 
-//    public static void main(String[] args){
-//        /* 1. Action controller for GUI interactions. If set to null, running without visuals. */
-//        ActionController ac = new ActionController(); //null;
-//
-//        /* 2. Game seed */
-//        long seed = System.currentTimeMillis(); //0;
-//
-//        /* 3. Set up players for the game */
-//        ArrayList<AbstractPlayer> players = new ArrayList<>();
-//        players.add(new RandomPlayer(new Random()));
-//        players.add(new RMHC());
-//
-//        /* 4. Run! */
-//        int wonGames = 0;
-//        for (int i = 0; i < 1000; i++) {
-//            Game game = runOne(TicTacToe, players, seed, ac, false);
-//            if (game.getGameState().getPlayerResults()[1] == Utils.GameResult.WIN) {
-//                wonGames += 1;
-//            }
-//        }
-//        System.out.println(wonGames);
-//    }
+    public static void main(String[] args){
+        /* 1. Action controller for GUI interactions. If set to null, running without visuals. */
+        ActionController ac = new ActionController(); //null;
+
+        /* 2. Game seed */
+        long seed = System.currentTimeMillis(); //0;
+
+        /* 3. Set up players for the game */
+        ArrayList<AbstractPlayer> players = new ArrayList<>();
+        players.add(new RandomPlayer(new Random()));
+        players.add(new RMHCPlayer());
+
+        /* 4. Run! */
+        int wonGames = 0;
+        for (int i = 0; i < 1000; i++) {
+            Game game = runOne(TicTacToe, players, seed, ac, false);
+            if (game.getGameState().getPlayerResults()[1] == Utils.GameResult.WIN) {
+                wonGames += 1;
+            }
+        }
+        System.out.println(wonGames);
+    }
 
 }

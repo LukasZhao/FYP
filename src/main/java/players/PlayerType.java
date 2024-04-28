@@ -34,7 +34,8 @@ public enum PlayerType {
     Random (new ArrayList<Property>() {{ add(Simple); add(Stochastic); }}),
     OSLA (new ArrayList<Property>() {{ add(Simple); add(Stochastic); add(ForwardPlanning); add(Greedy); }}),
     MCTS (new ArrayList<Property>() {{ add(Stochastic); add(ForwardPlanning); add(TreeSearch); }}),
-    RMHC (new ArrayList<Property>() {{ add(Stochastic); add(ForwardPlanning); add(EvolutionaryAlgorithm); }});
+    RMHC (new ArrayList<Property>() {{ add(Stochastic); add(ForwardPlanning); add(EvolutionaryAlgorithm); }}), 
+    RL_player(new ArrayList<Property>() {{add(Stochastic);add(ForwardPlanning);add(EvolutionaryAlgorithm);}});
 
     /**
      * Converts a given string to the enum type corresponding to the player.
