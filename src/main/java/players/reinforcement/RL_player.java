@@ -1,4 +1,3 @@
-
 package players.reinforcement;
 
 import core.AbstractGameState;
@@ -52,7 +51,7 @@ public class RL_player extends AbstractPlayer {
     private double epsilon_decay; // epsilon decay rate
     public final Map<String, Double> qTable; // state-action Q-value
     private final Random random;
-    private static int totalIterations = 100000;
+    private static int totalIterations = 20000;
 
     public RL_player(double alpha, double gamma, double epsilon, long seed) {
         this.alpha = alpha;
@@ -61,7 +60,7 @@ public class RL_player extends AbstractPlayer {
         this.qTable = new HashMap<>();
         this.random = new Random(seed);
         this.final_epsilon = 0.1;
-        this.epsilon_decay = epsilon / (totalIterations / 0.68); // 
+        this.epsilon_decay = epsilon / (totalIterations / 0.68); //
     }
 
     public void setPlayerID(int id) {
@@ -70,8 +69,8 @@ public class RL_player extends AbstractPlayer {
 
     @Override
     public AbstractAction _getAction(AbstractGameState gameState, List<AbstractAction> possibleActions) {
-        //epsilon = Math.max(final_epsilon, epsilon - epsilon_decay);
-        //System.out.println("epsilon is" + epsilon);
+        // epsilon = Math.max(final_epsilon, epsilon - epsilon_decay);
+        // System.out.println("epsilon is" + epsilon);
         if (random.nextDouble() < epsilon) {
             // 探索: 随机选择行动
             return possibleActions.get(random.nextInt(possibleActions.size()));
@@ -102,15 +101,14 @@ public class RL_player extends AbstractPlayer {
         double q = qTable.getOrDefault(actionKey, 0.0); // get the current q-value
         double maxQNext = done ? 0 : getMaxQ(nextState); // calculate the next q-value
 
-        //  Temporal Difference (TD) error
+        // Temporal Difference (TD) error
         double tdError = reward + gamma * maxQNext - q;
 
-        // in order to update the q value, use the learning rate 
-        double newQ = q + alpha * tdError; // TD error in use as well 
-                qTable.put(actionKey, newQ); // keep the new q-value in the hashtable
+        // in order to update the q value, use the learning rate
+        double newQ = q + alpha * tdError; // TD error in use as well
+        qTable.put(actionKey, newQ); // keep the new q-value in the hashtable
     }
 
-  
     private double getMaxQ(String nextState) {
         return qTable.entrySet().stream()
                 .filter(e -> e.getKey().startsWith(nextState))
@@ -121,9 +119,9 @@ public class RL_player extends AbstractPlayer {
 
     public String encodeState(BlackjackGameState gameState) {
         int playerPoints = gameState.calculatePoints(getPlayerID());
-        // get the one visuable dealer card 
+        // get the one visuable dealer card
         FrenchCard dealerVisibleCard = (FrenchCard) gameState.getDrawDeck().peek();
-        // 
+        //
         int dealerVisibleValue = dealerVisibleCard != null ? dealerVisibleCard.number : -1;
 
         return playerPoints + ":" + dealerVisibleValue;
@@ -132,7 +130,7 @@ public class RL_player extends AbstractPlayer {
     public double calculateReward(BlackjackGameState gameState, int playerId) {
         CoreConstants.GameResult playerResult = gameState.getPlayerResults()[playerId];
         int playerPoints = gameState.calculatePoints(playerId); // Assume getPlayerPoints() method exists to fetch
-                                                                  // points
+                                                                // points
         double reward = 0.0;
 
         switch (playerResult) {
@@ -158,28 +156,34 @@ public class RL_player extends AbstractPlayer {
         return reward;
     }
 
+
     @Override
     public AbstractPlayer copy() {
         RL_player clone = new RL_player(alpha, gamma, epsilon, random.nextLong());
         clone.qTable.putAll(this.qTable);
         return clone;
     }
+
+
     public static void main(String[] args) {
         double win = 0.0;
         double lose = 0.0;
         double draw = 0.0;
-        RL_player rlPlayer = new RL_player(0.01, 0.95, 0.7, System.currentTimeMillis());
-        // 初始化前向模型
+        RL_player rlPlayer = new RL_player(0.3, 0.70, 1, System.currentTimeMillis());
+        // init forword model
         BlackjackForwardModel model = new BlackjackForwardModel();
         RewardChart chart = new RewardChart("RL Training Reward Progress", totalIterations);
 
+
+
         for (int i = 0; i < totalIterations; i++) {
-            long seed = System.currentTimeMillis(); // 更新种子以保证随机性
+            long seed = System.currentTimeMillis(); 
             BlackjackParameters params = new BlackjackParameters(seed);
-  //那为什么他也会有(25, 5, 0):
-            // 初始化游戏状态
-            BlackjackGameState gameState = new BlackjackGameState(params, 2); // 假设有2个玩家
-            model.setup(gameState); // 游戏开始的初始化
+
+            
+
+            BlackjackGameState gameState = new BlackjackGameState(params, 2); // two player, one rl one dealer
+            model.setup(gameState); 
             while (!gameState.isGameOver()) {
                 List<AbstractAction> possibleActions = model.computeAvailableActions(gameState);
                 AbstractAction chosenAction = rlPlayer.getAction(gameState, possibleActions);
@@ -197,6 +201,7 @@ public class RL_player extends AbstractPlayer {
                 }
             }
         }
+
         System.out.println("Training completed.");
         double win_rate = (win/totalIterations)*100;
         double lose_rate = (lose/totalIterations)*100;
