@@ -1,3 +1,4 @@
+User
 package players.reinforcement;
 
 import core.AbstractGameState;
@@ -13,7 +14,7 @@ import games.blackjack.BlackjackParameters;
 import net.jpountz.util.Utils;
 import players.PlayerType;
 import players.reinforcement.WinRateCalculator;
-
+import players.simple.RandomPlayer;
 import utilities.ElapsedCpuTimer;
 import core.CoreConstants;
 import utilities.Pair;
@@ -50,8 +51,7 @@ public class RL_player extends AbstractPlayer {
     private double epsilon; // 探索率
     private double final_epsilon; // 最终 epsilon
     private double epsilon_decay; // epsilon 衰减速率
-    private Map<String, double[]> qTable;
-    // 状态-行动对的Q值
+    public final Map<String, Double> qTable; // 状态-行动对的Q值
     private final Random random;
     private static int totalIterations = 20000;
 
@@ -62,7 +62,7 @@ public class RL_player extends AbstractPlayer {
         this.qTable = new HashMap<>();
         this.random = new Random(seed);
         this.final_epsilon = 0.1;
-        this.epsilon_decay = epsilon / (totalIterations / 0.58); // 假设衰减发生在总迭代次数的一半时间里
+        this.epsilon_decay = epsilon / (totalIterations / 0.68); // 假设衰减发生在总迭代次数的一半时间里
     }
 
     public void setPlayerID(int id) {
@@ -71,7 +71,7 @@ public class RL_player extends AbstractPlayer {
 
     @Override
     public AbstractAction _getAction(AbstractGameState gameState, List<AbstractAction> possibleActions) {
-        epsilon = Math.max(final_epsilon, epsilon - epsilon_decay);
+        //epsilon = Math.max(final_epsilon, epsilon - epsilon_decay);
         //System.out.println("epsilon is" + epsilon);
         if (random.nextDouble() < epsilon) {
             // 探索: 随机选择行动
@@ -89,12 +89,7 @@ public class RL_player extends AbstractPlayer {
 
         for (AbstractAction action : possibleActions) {
             String actionKey = state + action.toString();
-            double[] qValues = qTable.getOrDefault(actionKey, new double[] { 0.0, 0.0 });
-
-            // 假设数组的第一个元素是“停牌”，第二个元素是“要牌”
-            int actionIndex = action instanceof Stand ? 0 : 1;
-            double qValue = qValues[actionIndex];
-
+            double qValue = qTable.getOrDefault(actionKey, 0.0);
             if (qValue > maxQ) {
                 maxQ = qValue;
                 bestAction = action;
@@ -105,39 +100,24 @@ public class RL_player extends AbstractPlayer {
 
     public void updateQTable(String state, AbstractAction action, double reward, String nextState, boolean done) {
         String actionKey = state + ":" + action.toString();
-        // getOrDefault 应该返回一个 double[] 类型的数组，而不是 Double
-        double[] qValues = qTable.getOrDefault(actionKey, new double[] { 0.0, 0.0 });
-
-        // 确定动作索引
-        int actionIndex = action instanceof Stand ? 0 : 1;
-
-        double q = qValues[actionIndex]; // 获取当前动作的 Q 值
+        double q = qTable.getOrDefault(actionKey, 0.0); // 获取当前 Q 值
         double maxQNext = done ? 0 : getMaxQ(nextState); // 计算下一个状态的最大 Q 值
 
         // 计算 Temporal Difference (TD) error
         double tdError = reward + gamma * maxQNext - q;
 
         // 更新 Q 值，加入学习率 alpha
-        qValues[actionIndex] = q + alpha * tdError; // 更新对应动作的 Q 值
-
-        // 存储新的 Q 值数组回 qTable
-        qTable.put(actionKey, qValues);
+        double newQ = q + alpha * tdError; // 使用TD error 更新 Q 值
+        qTable.put(actionKey, newQ); // 存储新的 Q 值
     }
 
+  
     private double getMaxQ(String nextState) {
-        // 从 qTable 中检索所有与 nextState 开头的条目，并找到最大的 Q 值
-        double maxQ = Double.NEGATIVE_INFINITY;
-        for (Map.Entry<String, double[]> entry : qTable.entrySet()) {
-            if (entry.getKey().startsWith(nextState)) {
-                double[] qValues = entry.getValue();
-                for (double q : qValues) {
-                    if (q > maxQ) {
-                        maxQ = q;
-                    }
-                }
-            }
-        }
-        return maxQ;
+        return qTable.entrySet().stream()
+                .filter(e -> e.getKey().startsWith(nextState))
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getValue)
+                .orElse(0.0);
     }
 
     public String encodeState(BlackjackGameState gameState) {
@@ -189,12 +169,11 @@ public class RL_player extends AbstractPlayer {
     // RewardChart chart = new RewardChart("RL Training Reward Progress");
     // 更新奖励图表
     // chart.updateChart(i, reward);
-    
     public static void main(String[] args) {
         double win = 0.0;
         double lose = 0.0;
         double draw = 0.0;
-        RL_player rlPlayer = new RL_player(0.2, 0.95, 1, System.currentTimeMillis());
+        RL_player rlPlayer = new RL_player(0.4, 0.95, 1, System.currentTimeMillis());
         // 初始化前向模型
         BlackjackForwardModel model = new BlackjackForwardModel();
         RewardChart chart = new RewardChart("RL Training Reward Progress", totalIterations);
@@ -221,7 +200,7 @@ public class RL_player extends AbstractPlayer {
                             gameState.isGameOver());
                     chart.updateChart(i, reward);
                     // 更新 Q-表的视图
-                    //visualizer.updateQTable(rlPlayer.qTable);
+                    visualizer.updateQTable(rlPlayer.qTable, i + 1);
                     break;
                 }
             }
@@ -237,9 +216,9 @@ public class RL_player extends AbstractPlayer {
         System.out.println(win_rate + "%");
         System.out.println(lose_rate + "%");
         chart.displayChart();
-        
+        //visualizer.QTableVisualizer();
         // rlPlayer.qTable.forEach((key, value) -> System.out.println(key + ": " +
         // value));
-
     }
+
 }
