@@ -171,6 +171,7 @@ public class RL_player extends AbstractPlayer {
         double draw = 0.0;
         RL_player rlPlayer = new RL_player(0.3, 0.70, 1, System.currentTimeMillis());
         // init forword model
+        QTableVisualizer table = new QTableVisualizer();
         BlackjackForwardModel model = new BlackjackForwardModel();
         RewardChart chart = new RewardChart("RL Training Reward Progress", totalIterations);
 
@@ -197,11 +198,11 @@ public class RL_player extends AbstractPlayer {
                     rlPlayer.updateQTable(rlPlayer.encodeState(gameState), chosenAction, reward, nextState,
                             gameState.isGameOver());
                     chart.updateChart(i, reward);
+                    table.updateQTable(rlPlayer.qTable, i+1);
                     break;
                 }
             }
         }
-
         System.out.println("Training completed.");
         double win_rate = (win/totalIterations)*100;
         double lose_rate = (lose/totalIterations)*100;
