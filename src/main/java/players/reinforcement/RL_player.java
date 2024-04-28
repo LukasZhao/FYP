@@ -52,7 +52,7 @@ public class RL_player extends AbstractPlayer {
     private double epsilon_decay; // epsilon decay rate
     public final Map<String, Double> qTable; // state-action Q-value
     private final Random random;
-    private static int totalIterations = 20000;
+    private static int totalIterations = 100000;
 
     public RL_player(double alpha, double gamma, double epsilon, long seed) {
         this.alpha = alpha;
@@ -168,7 +168,7 @@ public class RL_player extends AbstractPlayer {
         double win = 0.0;
         double lose = 0.0;
         double draw = 0.0;
-        RL_player rlPlayer = new RL_player(0.8, 0.95, 0.7, System.currentTimeMillis());
+        RL_player rlPlayer = new RL_player(0.01, 0.95, 0.7, System.currentTimeMillis());
         // 初始化前向模型
         BlackjackForwardModel model = new BlackjackForwardModel();
         RewardChart chart = new RewardChart("RL Training Reward Progress", totalIterations);
