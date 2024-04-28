@@ -30,7 +30,7 @@ public class BlackjackForwardModel extends StandardForwardModel {
         bjgs.drawDeck.shuffle(new Random((bjgs.getGameParameters().getRandomSeed())));
 
         bjgs.setFirstPlayer(0);
-        // 然后为dealer添加一张暗牌
+        // 
         //Create a hand for each player
         boolean[] visibility = new boolean[firstState.getNPlayers()];
         Arrays.fill(visibility, true);
@@ -95,12 +95,12 @@ public class BlackjackForwardModel extends StandardForwardModel {
         return actions;
     }
 
-    // 在模型中添加一个新的方法来执行动作
+    // 
     public void performAction(BlackjackGameState gameState, AbstractAction action) {
-        // 首先应用动作
+        // 
         action.execute(gameState);
 
-        // 然后调用 _afterAction 处理后续逻辑
+        // 
         _afterAction(gameState, action);
     }
 

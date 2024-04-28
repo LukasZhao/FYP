@@ -821,32 +821,38 @@ public class Game {
      * and then run this class.
      */
     public static void main(String[] args) {
-        String gameType = "Blackjack"; // 选择游戏类型
-        boolean useGUI = true; // 是否使用图形界面
-        int turnPause = 1000; // 每回合的暂停时间（毫秒），可用于观察
-        long seed = System.currentTimeMillis(); // 游戏的随机种子
+        String gameType = "Blackjack"; // chose the game 
+        boolean useGUI = true; 
+        int turnPause = 1000; 
+        long seed = System.currentTimeMillis(); // random seed for each round of game 
         ActionController ac = new ActionController(); // GUI交互控制器
 
-        // 设置玩家
+        // setupo the players
         ArrayList<AbstractPlayer> players = new ArrayList<>();
-        RL_player trainedRLPlayer = new RL_player(0.6, 0.9, 0.8,seed); // 假设alpha=0.1, gamma=0.9, epsilon=0.1
+        RL_player trainedRLPlayer = new RL_player(0.6, 0.9, 0.8,seed); 
         
 
-        // 复制RL玩家
+        // copy the finished-training model
         RL_player playerCopy1 = (RL_player) trainedRLPlayer.copy();
 
-
+        //add players for game simulate 
         players.add(playerCopy1);
-        players.add(playerCopy1);
-        players.add(new HumanGUIPlayer(ac));
+       // players.add(playerCopy1);
         players.add(new RandomPlayer());
-        players.add(new RandomPlayer());
-        
-        
-        
-         // 添加另一个随机玩家进行比较
 
-    // 运行游戏
+
+        //this humanguiplayer is a player that actually join and play the game
+        //erase the slash to add it to game and have fun!
+        //players.add(new HumanGUIPlayer(ac));
+
+        players.add(new RandomPlayer());
+        //players.add(new RandomPlayer());
+        
+        
+        
+        
+
+    // rund game
     runOne(GameType.valueOf(gameType), null, players, seed, false, null, useGUI ? ac : null, turnPause);
 }
     }

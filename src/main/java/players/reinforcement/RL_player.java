@@ -45,12 +45,12 @@ import java.util.Random;
 import org.apache.avro.hadoop.file.SortedKeyValueFile.Reader;
 
 public class RL_player extends AbstractPlayer {
-    private double alpha; // 学习率
-    private double gamma; // 折扣因子
-    private double epsilon; // 探索率
-    private double final_epsilon; // 最终 epsilon
-    private double epsilon_decay; // epsilon 衰减速率
-    public final Map<String, Double> qTable; // 状态-行动对的Q值
+    private double alpha; // learning rate
+    private double gamma; // discount rate
+    private double epsilon; // epsilon rate
+    private double final_epsilon; // final epsilon
+    private double epsilon_decay; // epsilon decay rate
+    public final Map<String, Double> qTable; // state-action Q-value
     private final Random random;
     private static int totalIterations = 20000;
 
@@ -61,7 +61,7 @@ public class RL_player extends AbstractPlayer {
         this.qTable = new HashMap<>();
         this.random = new Random(seed);
         this.final_epsilon = 0.1;
-        this.epsilon_decay = epsilon / (totalIterations / 0.68); // 假设衰减发生在总迭代次数的一半时间里
+        this.epsilon_decay = epsilon / (totalIterations / 0.68); // 
     }
 
     public void setPlayerID(int id) {
@@ -99,15 +99,15 @@ public class RL_player extends AbstractPlayer {
 
     public void updateQTable(String state, AbstractAction action, double reward, String nextState, boolean done) {
         String actionKey = state + ":" + action.toString();
-        double q = qTable.getOrDefault(actionKey, 0.0); // 获取当前 Q 值
-        double maxQNext = done ? 0 : getMaxQ(nextState); // 计算下一个状态的最大 Q 值
+        double q = qTable.getOrDefault(actionKey, 0.0); // get the current q-value
+        double maxQNext = done ? 0 : getMaxQ(nextState); // calculate the next q-value
 
-        // 计算 Temporal Difference (TD) error
+        //  Temporal Difference (TD) error
         double tdError = reward + gamma * maxQNext - q;
 
-        // 更新 Q 值，加入学习率 alpha
-        double newQ = q + alpha * tdError; // 使用TD error 更新 Q 值
-        qTable.put(actionKey, newQ); // 存储新的 Q 值
+        // in order to update the q value, use the learning rate 
+        double newQ = q + alpha * tdError; // TD error in use as well 
+                qTable.put(actionKey, newQ); // keep the new q-value in the hashtable
     }
 
   
@@ -121,9 +121,9 @@ public class RL_player extends AbstractPlayer {
 
     public String encodeState(BlackjackGameState gameState) {
         int playerPoints = gameState.calculatePoints(getPlayerID());
-        // 获取庄家的可见牌
+        // get the one visuable dealer card 
         FrenchCard dealerVisibleCard = (FrenchCard) gameState.getDrawDeck().peek();
-        // 使用正确的number属性代替不存在的rank属性
+        // 
         int dealerVisibleValue = dealerVisibleCard != null ? dealerVisibleCard.number : -1;
 
         return playerPoints + ":" + dealerVisibleValue;
@@ -164,10 +164,6 @@ public class RL_player extends AbstractPlayer {
         clone.qTable.putAll(this.qTable);
         return clone;
     }
-    // 创建图表
-    // RewardChart chart = new RewardChart("RL Training Reward Progress");
-    // 更新奖励图表
-    // chart.updateChart(i, reward);
     public static void main(String[] args) {
         double win = 0.0;
         double lose = 0.0;
