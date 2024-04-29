@@ -59,8 +59,8 @@ public class RL_player extends AbstractPlayer {
         this.epsilon = epsilon;
         this.qTable = new HashMap<>();
         this.random = new Random(seed);
-        this.final_epsilon = 0.1;
-        this.epsilon_decay = epsilon / (totalIterations / 0.68); //
+        this.final_epsilon = 0.01;
+        this.epsilon_decay = epsilon / (totalIterations / 2); //
     }
 
     public void setPlayerID(int id) {
@@ -69,13 +69,13 @@ public class RL_player extends AbstractPlayer {
 
     @Override
     public AbstractAction _getAction(AbstractGameState gameState, List<AbstractAction> possibleActions) {
-        // epsilon = Math.max(final_epsilon, epsilon - epsilon_decay);
+        epsilon = Math.max(final_epsilon, epsilon - epsilon_decay);
         // System.out.println("epsilon is" + epsilon);
         if (random.nextDouble() < epsilon) {
-            // 探索: 随机选择行动
+         
             return possibleActions.get(random.nextInt(possibleActions.size()));
         } else {
-            // 利用: 根据Q值选择最好的行动
+            
             return getBestAction((BlackjackGameState) gameState, possibleActions);
         }
     }
@@ -129,8 +129,7 @@ public class RL_player extends AbstractPlayer {
 
     public double calculateReward(BlackjackGameState gameState, int playerId) {
         CoreConstants.GameResult playerResult = gameState.getPlayerResults()[playerId];
-        int playerPoints = gameState.calculatePoints(playerId); // Assume getPlayerPoints() method exists to fetch
-                                                                // points
+        int playerPoints = gameState.calculatePoints(playerId); 
         double reward = 0.0;
 
         switch (playerResult) {
@@ -169,7 +168,7 @@ public class RL_player extends AbstractPlayer {
         double win = 0.0;
         double lose = 0.0;
         double draw = 0.0;
-        RL_player rlPlayer = new RL_player(0.3, 0.70, 1, System.currentTimeMillis());
+        RL_player rlPlayer = new RL_player(0.1, 0.80, 1, System.currentTimeMillis());
         // init forword model
         QTableVisualizer table = new QTableVisualizer();
         BlackjackForwardModel model = new BlackjackForwardModel();
@@ -204,11 +203,11 @@ public class RL_player extends AbstractPlayer {
             }
         }
         System.out.println("Training completed.");
-        double win_rate = (win/totalIterations)*100;
-        double lose_rate = (lose/totalIterations)*100;
+       // double win_rate = (win/totalIterations)*100;
+       // double lose_rate = (lose/totalIterations)*100;
         System.out.println(draw);
-        System.out.println(win_rate + "%");
-        System.out.println(lose_rate + "%");
+       // System.out.println(win_rate + "%");
+       // System.out.println(lose_rate + "%");
         chart.displayChart();
     }
 

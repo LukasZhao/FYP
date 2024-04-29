@@ -52,7 +52,7 @@ public class BlackjackGameState extends AbstractGameState implements IPrintable 
     }
 
     public boolean isGameOver() {
-        // 检查每个玩家的游戏结果，如果有任何玩家的游戏状态不是进行中，则游戏结束
+        
         for (CoreConstants.GameResult playerResult : getPlayerResults()) {
             if (playerResult != GAME_ONGOING) {
                 return true;

@@ -828,7 +828,7 @@ public class Game {
         ActionController ac = new ActionController(); 
         // setupo the players
         ArrayList<AbstractPlayer> players = new ArrayList<>();
-        RL_player trainedRLPlayer = new RL_player(0.6, 0.9, 0.8,seed);
+        RL_player trainedRLPlayer = new RL_player(0.6, 0.9, 1,seed);
         
 
         // copy the finished-training model
@@ -839,15 +839,12 @@ public class Game {
         
         players.add(playerCopy1);
 
-       
-
-       
-
         //this humanguiplayer is a player that actually join and play the game
         //erase the slash to add it to game and have fun!
         
-        players.add(new HumanGUIPlayer(ac));
+        //players.add(new HumanGUIPlayer(ac));
 
+        players.add(new RandomPlayer());
         players.add(new RandomPlayer());
 
         //players.add(new RandomPlayer());
